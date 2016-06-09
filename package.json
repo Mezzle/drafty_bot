@@ -1,0 +1,18 @@
+{
+  "name": "drafty_bot",
+  "version": "0.0.0",
+  "private": true,
+  "author": "Martin Meredith <martin@sourceguru.net>",
+  "description": "Can anyone feel a draft?",
+  "dependencies": {
+    "hubot": "^2.19.0",
+    "hubot-diagnostics": "0.0.1",
+    "hubot-help": "^0.2.0",
+    "hubot-heroku-keepalive": "^1.0.2",
+    "hubot-redis-brain": "0.0.3",
+    "hubot-twitch-adapter": "^0.1.1"
+  },
+  "engines": {
+    "node": "0.10.x"
+  }
+}
