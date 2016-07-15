@@ -54,17 +54,20 @@ module.exports = (robot) ->
                     winner = k
 
         unless winner == ''
+            team = ''
             if robot.brain.data.draft.blue.length > robot.brain.data.draft.red.length
                 robot.brain.data.draft.red.push(winner)
+                team = 'RED'
             else
                 robot.brain.data.draft.blue.push(winner)
+                team = 'BLUE'
 
             resetVotes()
 
             if robot.brain.data.draft.blue.length == 5 && robot.brain.data.draft.red.length == 5
-                res.send 'FINISHED'
+                res.send res.send team + ': ' + winner + "\n" + 'FINISHED'
             else
-                res.send 'DONE - SEND NEXT'
+                res.send team + ': ' + winner
         else
             res.send 'NO WINNER YET'
 
