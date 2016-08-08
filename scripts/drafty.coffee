@@ -25,6 +25,7 @@ module.exports = (robot) ->
         if !err
             data = JSON.parse(body)
 
+            robot.brain.data.heroes = []
             for hero in data
                 robot.brain.data.heroes.push(hero.name)
                 robot.hear new RegExp('^!(' + hero.name + ')$', 'i'), id: 'hero.vote', (res) ->
@@ -47,20 +48,52 @@ module.exports = (robot) ->
         maxv = 0
         winner = ''
 
-        for k,v of robot.brain.data.votes
-            unless k in robot.brain.data.draft.blue || k in robot.brain.data.draft.red
-                if v > maxv
-                    maxv = v
-                    winner = k
+        team = ''
+        if robot.brain.data.draft.blue.length > robot.brain.data.draft.red.length
+            team = 'RED'
+        else
+            team = 'BLUE'
+
+        choRed = 'cho' in robot.brain.data.draft.red
+        choBlue = 'cho' in robot.brain.data.draft.blue
+        gallRed = 'gall' in robot.brain.data.draft.red
+        gallBlue = 'gall' in robot.brain.data.draft.blue
+
+        chogallRed = choRed && gallRed
+        chogallBlue = choBlue && gallBlue
+
+        if team == 'RED' && (choRed || gallRed) && !chogallRed
+            if choRed
+                winner = 'gall'
+            else
+                winner = 'cho'
+        else if team == 'BLUE' && (choBlue || gallBlue) && !chogallBlue
+            if choBlue
+                winner = 'gall'
+            else
+                winner = 'cho'
+        else
+            for k,v of robot.brain.data.votes
+                alreadyPicked = k in robot.brain.data.draft.blue || k in robot.brain.data.draft.red
+                choGallPicked = (k == 'cho' || k == 'gall')
+
+                if team == 'RED'
+                    noChogallspace = robot.brain.data.draft.red.length >= 4 && choGallPicked
+                    choGallOtherTeam = (choBlue || gallBlue) && choGallPicked
+                else
+                    noChogallspace = robot.brain.data.draft.blue.length >= 4 && choGallPicked
+                    choGallOtherTeam = (choRed || gallRed) && choGallPicked
+
+                unless alreadyPicked || noChogallspace || choGallOtherTeam
+                    if v > maxv
+                        maxv = v
+                        winner = k
 
         unless winner == ''
-            team = ''
-            if robot.brain.data.draft.blue.length > robot.brain.data.draft.red.length
+            if team == 'RED'
                 robot.brain.data.draft.red.push(winner)
-                team = 'RED'
             else
                 robot.brain.data.draft.blue.push(winner)
-                team = 'BLUE'
 
             resetVotes()
 
